@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import NewsItem from './NewsItem';
 import axios from 'axios';
-const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=${process.env.REACT_APP_NEWS_API_KEY}`;
+const API_KEY = process.env.REACT_APP_NEWS_API_KEY;
 
 const NewsListBlock = styled.div`
   box-sizing: border-box;
@@ -17,7 +17,7 @@ const NewsListBlock = styled.div`
   }
 `;
 
-const NewsList = () => {
+const NewsList = ({ category }) => {
   const [articles, setArticles] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -25,9 +25,12 @@ const NewsList = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        console.log('url:', url);
-        const response = await axios.get(`${url}`);
+        const query = category === 'all' ? '' : `&category=${category}`;
+        const response = await axios.get(
+          `https://newsapi.org/v2/top-headlines?country=us${query}&apiKey=${API_KEY}`
+        );
         setArticles(response.data.articles);
+        console.log('query:', query);
         console.log('articles:', articles);
       } catch (e) {
         console.log(e);
@@ -35,7 +38,7 @@ const NewsList = () => {
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [category]);
 
   if (loading) {
     return <NewsListBlock>대기 중...</NewsListBlock>;
